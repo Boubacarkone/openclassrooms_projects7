@@ -27,6 +27,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 import os
+import re
 from pathlib import Path
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -361,11 +362,17 @@ def main(debug = False):
         df = df.join(cc, how='left', on='SK_ID_CURR')
         del cc
         gc.collect()
-    return df
-   # with timer("Run LightGBM with kfold"):
-    #    feat_importance = kfold_lightgbm(df, num_folds= 10, stratified= False, debug= debug)
 
+    #with timer("Run LightGBM with kfold"):
+        #feat_importance = kfold_lightgbm(df, num_folds= 10, stratified= False, debug= debug)
+
+    return df
+    
 if __name__ == "__main__":
-    submission_file_name = "submission_kernel02.csv"
+    submission_file_name = "submission_kernel03.csv"
     with timer("Full model run"):
-        main()
+        df = pd.read_csv("data/data_preprocessed_final.csv", index_col=[0])
+        df = df.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+        
+        kfold_lightgbm(df=df, num_folds=10, stratified=False, debug=True)
+        

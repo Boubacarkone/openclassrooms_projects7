@@ -88,67 +88,7 @@ def missing_values_table(df):
         # Return the dataframe with missing information
         return mis_val_table_ren_columns
 
-#Feature selections fonctions
-def kfold_lightgbm_feature_selection(df, num_folds, stratified = False, debug= False, test=True):
+def remove_infite(df):
+    return df[np.isfinite(df).all(1)]
 
-    df = df.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
-    # Divide in training/validation and test data
-    train_df = df[df['TARGET'].notnull()].fillna(0)
-    test_df = df[df['TARGET'].isnull()].fillna(0)
-    print("Starting LightGBM. Train shape: {}, test shape: {}".format(train_df.shape, test_df.shape))
-    del df
-    gc.collect()
 
-    if test:
-        train_df = train_df.sample(20000)
-        test_df = test_df.sample(20000)
-        print("Starting LightGBM. Train reshape: {}, Test reshape: {}".format(train_df.shape, test_df.shape))
-    # Cross validation model
-    if stratified:
-        folds = StratifiedKFold(n_splits= num_folds, shuffle=True, random_state=1001)
-    else:
-        folds = KFold(n_splits= num_folds, shuffle=True, random_state=1001)
-    # Create arrays and dataframes to store results
-    oof_preds = np.zeros(train_df.shape[0])
-    sub_preds = np.zeros(test_df.shape[0])
-    feature_importance_df = pd.DataFrame()
-    feats = [f for f in train_df.columns if f not in ['TARGET','SK_ID_CURR','SK_ID_BUREAU','SK_ID_PREV','index']]
-    
-    for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
-        train_x, train_y = train_df[feats].iloc[train_idx], train_df['TARGET'].iloc[train_idx]
-        valid_x, valid_y = train_df[feats].iloc[valid_idx], train_df['TARGET'].iloc[valid_idx]
-
-        # LightGBM parameters found by Bayesian optimization
-        clf = RandomForestClassifier(random_state=42)
-
-        clf.fit(train_x, train_y)
-
-        oof_preds[valid_idx] = clf.predict_proba(valid_x, num_iteration=clf.best_iteration_)[:, 1]
-        sub_preds += clf.predict_proba(test_df[feats], num_iteration=clf.best_iteration_)[:, 1] / folds.n_splits
-
-        fold_importance_df = pd.DataFrame()
-        fold_importance_df["feature"] = feats
-        fold_importance_df["importance"] = clf.feature_importances_
-        fold_importance_df["fold"] = n_fold + 1
-        feature_importance_df = pd.concat([feature_importance_df, fold_importance_df], axis=0)
-        print('Fold %2d AUC : %.6f' % (n_fold + 1, roc_auc_score(valid_y, oof_preds[valid_idx])))
-        del clf, train_x, train_y, valid_x, valid_y
-        gc.collect()
-
-    print('Full AUC score %.6f' % roc_auc_score(train_df['TARGET'], oof_preds))
-    # Write submission file and plot feature importance
-    if not debug:
-        test_df['TARGET'] = sub_preds
-        test_df[['SK_ID_CURR', 'TARGET']].to_csv(submission_file_name, index= False)
-    display_importances(feature_importance_df)
-    return feature_importance_df
-
-# Display/plot feature importance
-def display_importances(feature_importance_df_, n_feat=40, fx=8, fy=10):
-    cols = feature_importance_df_[["feature", "importance"]].groupby("feature").mean().sort_values(by="importance", ascending=False)[:n_feat].index
-    best_features = feature_importance_df_.loc[feature_importance_df_.feature.isin(cols)]
-    plt.figure(figsize=(fx, fy))
-    sns.barplot(x="importance", y="feature", data=best_features.sort_values(by="importance", ascending=False))
-    plt.title('LightGBM Features (avg over folds)')
-    plt.tight_layout()
-    plt.savefig('lgbm_importances01.png')
