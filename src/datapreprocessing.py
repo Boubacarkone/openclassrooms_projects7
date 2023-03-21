@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import seaborn as sns
 sns.set()
+sns.set_theme(style="ticks")
 import sys
 import os
 # directory reach
@@ -28,7 +29,7 @@ from contextlib import contextmanager
 def timer(title):
     t0 = time.time()
     yield
-    print("{} - done in {:.0f}s".format(title, time.time() - t0))
+    print("{} - done in {:.0f}mns".format(title, (time.time() - t0)/60))
 
 def data_process(Tables_path:Path, debug=False):
     #Recupération des données
@@ -69,6 +70,8 @@ def data_process(Tables_path:Path, debug=False):
     print("\nData preprocessing : Sélection de features")
 
     # All
+    #Corrélation entre variables
+    SK_ID_CURR = data_preproced['SK_ID_CURR']
     corrs = data_preproced.corr()
 
     #Corrélation avec la variable cible target
@@ -126,8 +129,10 @@ def data_process(Tables_path:Path, debug=False):
             pass
     
     if debug:
+        data_preproced['SK_ID_CURR'] = SK_ID_CURR
         data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug_v0.csv'))
     else:
+        data_preproced['SK_ID_CURR'] = SK_ID_CURR
         data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final_v0.csv'))
 
     print(f"Dimension des données après suppréssion des varaibles précédement ciblés : {data_preproced.shape}")
@@ -142,7 +147,7 @@ def data_process(Tables_path:Path, debug=False):
     
     #Gestion du déséquilibre de TARGET
     datas = data_preproced[data_preproced.TARGET == 1]
-    datas = pd.concat([datas, data_preproced[data_preproced.TARGET == 0].sample(len(datas))], ignore_index=True)
+    datas = pd.concat([datas, data_preproced[data_preproced.TARGET == 0].sample(len(datas), random_state=42)], ignore_index=True)
     print(f"Dimension des données sélectionnés pour cette étape : {datas.shape}")
 
     print("Separation des données")
@@ -207,9 +212,13 @@ def data_process(Tables_path:Path, debug=False):
     print("Sauvegarde des données avec les features sélectionnées")
     important_features.insert(0,'TARGET')
     if debug:
-        data_preproced[important_features].to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug.csv'))
+        data_preproced = data_preproced[important_features]
+        data_preproced['SK_ID_CURR'] = SK_ID_CURR
+        data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug.csv'))
     else:
-        data_preproced[important_features].to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final.csv'))
+        data_preproced = data_preproced[important_features]
+        data_preproced['SK_ID_CURR'] = SK_ID_CURR
+        data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final.csv'))
 
     print("\nFin des la preparation des données !")
 
