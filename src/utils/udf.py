@@ -195,7 +195,7 @@ def evaluate_model_confusion_matrix(model, model_name, X_test, y_test):
     plt.close()
     return scores, image_path
 
-def data_reader(data, percentage:int, save_test_df:bool=False):
+def data_reader(data, percentage:int, save_test_df:bool=False, return_var_cat:bool=False):
 
     nb_class_1 = int(len(data[data.TARGET == 1])*percentage/100)
     nb_class_0 = int(len(data[data.TARGET == 0])*percentage/100)
@@ -222,6 +222,12 @@ def data_reader(data, percentage:int, save_test_df:bool=False):
     train_df = remove_infite(train_df)
     test_df = remove_infite(test_df)
 
+    if save_test_df:
+        test_df = test_df.rename(columns=lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+        test_df.to_csv(str(str(Path(PROJECT_ROOT)) + f"/model_and_data/test_df_not_norm.csv"))
+        train_df = train_df.rename(columns=lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+        train_df.to_csv(str(str(Path(PROJECT_ROOT)) + f"/model_and_data/train_df_not_norm.csv"))
+
     feature_names = train_df.columns.to_list()
     #Feature à normaliser
     var_to_norm = []
@@ -229,6 +235,7 @@ def data_reader(data, percentage:int, save_test_df:bool=False):
         
         if len(train_df[var].value_counts().values.tolist()) > 2:
             var_to_norm.append(var)
+    
             
     scaler = StandardScaler()
     train_df[var_to_norm] = scaler.fit_transform(train_df[var_to_norm])
@@ -251,5 +258,103 @@ def data_reader(data, percentage:int, save_test_df:bool=False):
         X_test.to_csv(str(str(Path(PROJECT_ROOT)) + f"/model_and_data/X_validation.csv"))
         y_test.to_csv(str(str(Path(PROJECT_ROOT)) + f"/model_and_data/y_validation.csv"))
     
+    if return_var_cat:
+        return X_train, X_test, y_train, y_test, feature_names, var_to_norm
+    else:
+        return X_train, X_test, y_train, y_test, feature_names
+    
 
-    return X_train, X_test, y_train, y_test, feature_names
+
+def cat_variable_df_reader():
+    """Retourne et le taux de TARGET = 1 pour chaque modalité d'une variable catégorielle"""
+
+    data = pd.read_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final_v0.csv'), index_col=[0])
+    data = data.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x))
+    data.set_index('SK_ID_CURR', inplace=True)
+    train_df = data[data['TARGET'].notnull()]
+
+    cat_vars = []
+    for var in train_df.columns[1:]:
+        
+        if len(train_df[var].value_counts().values.tolist()) == 2:
+            cat_vars.append(var)
+    
+
+    def get_upper(c):
+        c_list = list(c)
+        
+        if c.isupper():
+            
+            return c
+        
+        else:
+
+            for i in range(len(c_list)):
+
+                c_list.pop()
+                n_c = "".join(c_list)
+
+                Is_upper = n_c.isupper()
+
+                if Is_upper:
+                    return n_c[:-2]
+                    break
+    
+    name_var_cat = set([get_upper(c) for c in cat_vars])
+    col_name = train_df.columns.to_list()
+
+    res = {}
+    for var_cat_name in name_var_cat:
+        
+        l = []
+        for var in col_name:
+            
+            if var_cat_name in var:
+                
+                l.append(var)
+        
+        res[var_cat_name] = l
+    
+    DF = pd.DataFrame()
+    for key, val in res.items():
+        
+        Res = {}
+        #Res["Cat_name"] = key
+        if len(val) == 1:
+            
+            pos_1 = len(train_df[(train_df[val[0]] == 1) & (train_df['TARGET'] == 1)])
+            tt = len(train_df[train_df[val[0]] == 1])
+            #print(pos_1)
+            Res[key] = "1"
+            if tt != 0:
+                Res["Dif_count"] = (pos_1/tt)*100
+            else:
+                Res["Dif_count"] = 0
+                
+            DF = pd.concat([DF, pd.DataFrame([Res])], ignore_index=True)
+            
+            neg_0 = len(train_df[(train_df[val[0]] == 0) & (train_df['TARGET'] == 1)])
+            tt = len(train_df[train_df[val[0]] == 0])
+            Res[key] = "0"
+            
+            if tt != 0:
+                Res["Dif_count"] = (neg_0/tt)*100
+            else:
+                Res["Dif_count"] = 0
+            DF = pd.concat([DF, pd.DataFrame([Res])], ignore_index=True)
+        
+        else:
+            for v in val:
+                
+                pos_v = len(train_df[(train_df[v] == 1) & (train_df['TARGET'] == 1)])
+                Res[key] = v
+                tt = len(train_df[train_df[v] == 1])
+                
+                if tt != 0:
+                    Res["Dif_count"] = (pos_v/tt)*100
+                else:
+                    Res["Dif_count"] = 0
+                DF = pd.concat([DF, pd.DataFrame([Res])], ignore_index=True)
+
+    return DF
+            
