@@ -16,6 +16,7 @@ eggs/
 .eggs/
 lib/
 data/
+model_and_data/
 mlruns/
 lib64/
 parts/
