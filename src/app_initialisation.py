@@ -7,8 +7,8 @@
 
 import os
 import pandas as pd
-import src.utils.udf as udf
-import src.datapreprocessing as dp
+import utils.udf as udf
+import datapreprocessing as dp
 import re
 from subprocess import run, PIPE
 
