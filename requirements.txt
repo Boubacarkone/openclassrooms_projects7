@@ -15,7 +15,6 @@ lightgbm
 lime
 imbalanced-learn
 imblearn
-sklearn
 scikit-image
 
 
