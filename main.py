@@ -59,6 +59,7 @@ X_test.to_csv(PROJECT_ROOT + '/model_and_data/X_test.csv')
 y_train.to_csv(PROJECT_ROOT + '/model_and_data/y_train.csv')
 y_test.to_csv(PROJECT_ROOT + '/model_and_data/y_test.csv')
 
+print("Model training...")
 #RandomForestClassifier
 from sklearn.ensemble import RandomForestClassifier
 from imblearn.pipeline import Pipeline
@@ -80,6 +81,7 @@ model_fited = forest_smote.fit(X_train, y_train)
 import pickle
 pickle.dump(model_fited, open(PROJECT_ROOT + '/model_and_data/model.pkl', 'wb'))
 
+print("Model global feature importance...")
 #get global feature importance
 feature_importance = model_fited['model'].feature_importances_
 f_importance_df = pd.DataFrame([X_train.columns.tolist(), feature_importance]).T
@@ -89,6 +91,7 @@ f_importance_df.sort_values(by='Importance', ascending=True, inplace=True)
 #save the feature importance to csv file in the folder model_and_data
 f_importance_df.to_csv(PROJECT_ROOT + '/model_and_data/golbal_feature_importance.csv')
 
+print("Run the Flask app...")
 #run the app.py file with the run command
 run(['python', PROJECT_ROOT + '/src/app.py'], stdout=PIPE, stderr=PIPE, universal_newlines=True)
 
