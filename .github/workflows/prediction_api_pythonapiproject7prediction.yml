@@ -35,7 +35,7 @@ jobs:
         run: pip install -r requirements.txt
 
       #- name: run src/app_initialisation.py
-        #run: |
+        ##run: |
           #python src/app_initialisation.py
         
       # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
