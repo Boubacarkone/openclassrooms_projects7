@@ -5,7 +5,6 @@
 #Train the model and save it to the folder model_and_data
 #Deploy the model using flask
 
-import wget
 import os
 import pandas as pd
 import src.utils.udf as udf
