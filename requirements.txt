@@ -8,7 +8,6 @@ alembic==1.9.4
 aniso8601==9.0.1
 ansi2html==1.8.0
 anyio==3.6.2
-appnope @ file:///opt/concourse/worker/volumes/live/5f13e5b3-5355-4541-5fc3-f08850c73cf9/volume/appnope_1606859448618/work
 argcomplete==2.0.0
 argon2-cffi==21.3.0
 argon2-cffi-bindings==21.2.0
