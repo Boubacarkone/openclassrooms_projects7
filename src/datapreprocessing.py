@@ -3,11 +3,19 @@
 #Feacture sélection : corrélation + permutation importance du randomforestClassifer
 #Sauvegarde des données prétraitées
 
+import sys
+
+#Correct the error no module named 'utils' when running the script main.py
+sys.path.append('src/')
+sys.path.append('src/utils/')
+
+
 import pandas as pd
 pd.options.mode.chained_assignment = None
 from pathlib import Path
 from tqdm import *
 import re
+
 
 from IPython.display import display_html #print de dataframes
 from utils import lightgbm_with_simple_features as ksf #kaggle kernel
@@ -17,7 +25,7 @@ import numpy as np
 import seaborn as sns
 sns.set()
 sns.set_theme(style="ticks")
-import sys
+
 import os
 # directory reach
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -31,7 +39,7 @@ def timer(title):
     yield
     print("{} - done in {:.0f}mns".format(title, (time.time() - t0)/60))
 
-def data_process(Tables_path:Path, debug=False):
+def data_process(Tables_path:Path, n_step=1, debug=False):
     #Recupération des données
     print("\nRecupération des données...")
     data_paths = []
@@ -138,89 +146,91 @@ def data_process(Tables_path:Path, debug=False):
     print(f"Dimension des données après suppréssion des varaibles précédement ciblés : {data_preproced.shape}")
     print(f"Nombre de variables supprimées : {798 - data_preproced.shape[1]}", "\n")
 
-    print("Feature sélection par feature permutation importance de randomforestClassier...\n")
-    from sklearn.ensemble import RandomForestClassifier
-    from sklearn.preprocessing import StandardScaler
-    from sklearn.model_selection import train_test_split
-    from sklearn.inspection import permutation_importance
-
-    
-    #Gestion du déséquilibre de TARGET
-    datas = data_preproced[data_preproced.TARGET == 1]
-    datas = pd.concat([datas, data_preproced[data_preproced.TARGET == 0].sample(len(datas), random_state=42)], ignore_index=True)
-    print(f"Dimension des données sélectionnés pour cette étape : {datas.shape}")
-
-    print("Separation des données")
-    train_df = datas[datas['TARGET'].notnull()]
-    test_df = datas[datas['TARGET'].isnull()]
-    feature_names = train_df.columns.to_list()
-    print("Train shape: {}, test shape: {}".format(train_df.shape, test_df.shape))
-
-    #Variable à normalisées
-    var_to_norm = []
-    for var in datas.columns:
+    if n_step == 1:
         
-        if len(datas[var].value_counts()) > 2:
-            var_to_norm.append(var)
-    print(f"Nombre de variable à normalisées : {len(var_to_norm)}")
+        print("Feature sélection par feature permutation importance de randomforestClassier...\n")
+        from sklearn.ensemble import RandomForestClassifier
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.model_selection import train_test_split
+        from sklearn.inspection import permutation_importance
 
-    scaler = StandardScaler()
-    train_df[var_to_norm] = scaler.fit_transform(train_df[var_to_norm])
+        
+        #Gestion du déséquilibre de TARGET
+        datas = data_preproced[data_preproced.TARGET == 1]
+        datas = pd.concat([datas, data_preproced[data_preproced.TARGET == 0].sample(len(datas), random_state=42)], ignore_index=True)
+        print(f"Dimension des données sélectionnés pour cette étape : {datas.shape}")
 
-    print("Imputation avec la valeur 0")
-    train_df.fillna(0, inplace=True)
-    test_df.fillna(0, inplace=True)
-    print(f"Nombre de valeur manque après imputation : {train_df.isna().sum().sum()}")
+        print("Separation des données")
+        train_df = datas[datas['TARGET'].notnull()]
+        test_df = datas[datas['TARGET'].isnull()]
+        feature_names = train_df.columns.to_list()
+        print("Train shape: {}, test shape: {}".format(train_df.shape, test_df.shape))
 
-    train_df = udf.remove_infite(train_df)
-    test_df = udf.remove_infite(test_df)
+        #Variable à normalisées
+        var_to_norm = []
+        for var in datas.columns:
+            
+            if len(datas[var].value_counts()) > 2:
+                var_to_norm.append(var)
+        print(f"Nombre de variable à normalisées : {len(var_to_norm)}")
 
-    y = train_df['TARGET']
-    del train_df['TARGET']
-    del test_df['TARGET']
+        scaler = StandardScaler()
+        train_df[var_to_norm] = scaler.fit_transform(train_df[var_to_norm])
 
-    X_train, X_test, y_train, y_test = train_test_split(train_df, y, stratify=y, random_state=42)
-    print(f"Train Dimension: \nX_train : {X_train.shape} \nX_test : {X_test.shape} \ny_train : {y_train.shape} \ny_test : {y_test.shape}")
+        print("Imputation avec la valeur 0")
+        train_df.fillna(0, inplace=True)
+        test_df.fillna(0, inplace=True)
+        print(f"Nombre de valeur manque après imputation : {train_df.isna().sum().sum()}")
 
-    forest = RandomForestClassifier(random_state=42)
-    forest.fit(X_train, y_train)
+        train_df = udf.remove_infite(train_df)
+        test_df = udf.remove_infite(test_df)
 
-    result = permutation_importance(
-        forest, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1
-    )
-    print("\nPermutation importance terminée\n")
-    forest_importances_mean = pd.Series(result.importances_mean, index=feature_names[1:]).rename('mean')
-    forest_importances_std = pd.Series(result.importances_std, index=feature_names[1:]).rename('std')
-    feature_importance_df = pd.DataFrame([forest_importances_mean, forest_importances_std]).T[1:]
-    feature_importance_df = feature_importance_df.sort_values('mean', ascending=False)
+        y = train_df['TARGET']
+        del train_df['TARGET']
+        del test_df['TARGET']
 
-    print("\nTracé du Graphique de corrélation\n")
-    plt.figure(figsize=(9, 8))
-    sns.barplot(x='mean', y=feature_importance_df.index[:20], data=feature_importance_df[:20])
-    sns.scatterplot(x='std', y=feature_importance_df.index[:20], data=feature_importance_df[:20], legend='auto')
-    plt.title("Feature importances using permutation importance")
-    if debug:
-        plt.savefig(str(str(Path(PROJECT_ROOT)) + '/data/permutation_importance_debug.png'))
-    else:
-        plt.savefig(str(str(Path(PROJECT_ROOT)) + '/data/permutation_importance.png'))
-    plt.close()
-   
-    #Les variables les plus important selon le modèle
-    important_features = feature_importance_df[feature_importance_df['mean'] > 0].index.to_list()
-    print(f"Le nombre de variables les plus importantes est : {len(important_features)}")
+        X_train, X_test, y_train, y_test = train_test_split(train_df, y, stratify=y, random_state=42)
+        print(f"Train Dimension: \nX_train : {X_train.shape} \nX_test : {X_test.shape} \ny_train : {y_train.shape} \ny_test : {y_test.shape}")
 
-    print("Sauvegarde des données avec les features sélectionnées")
-    important_features.insert(0,'TARGET')
-    if debug:
-        data_preproced = data_preproced[important_features]
-        data_preproced['SK_ID_CURR'] = SK_ID_CURR
-        data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug.csv'))
-    else:
-        data_preproced = data_preproced[important_features]
-        data_preproced['SK_ID_CURR'] = SK_ID_CURR
-        data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final.csv'))
+        forest = RandomForestClassifier(random_state=42)
+        forest.fit(X_train, y_train)
 
-    print("\nFin des la preparation des données !")
+        result = permutation_importance(
+            forest, X_test, y_test, n_repeats=5, random_state=42, n_jobs=-1
+        )
+        print("\nPermutation importance terminée\n")
+        forest_importances_mean = pd.Series(result.importances_mean, index=feature_names[1:]).rename('mean')
+        forest_importances_std = pd.Series(result.importances_std, index=feature_names[1:]).rename('std')
+        feature_importance_df = pd.DataFrame([forest_importances_mean, forest_importances_std]).T[1:]
+        feature_importance_df = feature_importance_df.sort_values('mean', ascending=False)
+
+        print("\nTracé du Graphique de corrélation\n")
+        plt.figure(figsize=(9, 8))
+        sns.barplot(x='mean', y=feature_importance_df.index[:20], data=feature_importance_df[:20])
+        sns.scatterplot(x='std', y=feature_importance_df.index[:20], data=feature_importance_df[:20], legend='auto')
+        plt.title("Feature importances using permutation importance")
+        if debug:
+            plt.savefig(str(str(Path(PROJECT_ROOT)) + '/data/permutation_importance_debug.png'))
+        else:
+            plt.savefig(str(str(Path(PROJECT_ROOT)) + '/data/permutation_importance.png'))
+        plt.close()
+    
+        #Les variables les plus important selon le modèle
+        important_features = feature_importance_df[feature_importance_df['mean'] > 0].index.to_list()
+        print(f"Le nombre de variables les plus importantes est : {len(important_features)}")
+
+        print("Sauvegarde des données avec les features sélectionnées")
+        important_features.insert(0,'TARGET')
+        if debug:
+            data_preproced = data_preproced[important_features]
+            data_preproced['SK_ID_CURR'] = SK_ID_CURR
+            data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug.csv'))
+        else:
+            data_preproced = data_preproced[important_features]
+            data_preproced['SK_ID_CURR'] = SK_ID_CURR
+            data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final.csv'))
+
+        print("\nFin des la preparation des données !")
 
 if __name__ == "__main__":
 
