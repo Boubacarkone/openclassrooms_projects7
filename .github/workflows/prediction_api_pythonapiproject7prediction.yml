@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Delete Old Artifacts 
-        uses: actions/github-script@v6
+        uses: actions/github-script@v2
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
