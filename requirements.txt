@@ -15,5 +15,7 @@ matplotlib
 numpy
 scikit-learn
 lightgbm
+lime
+IPython==8.12
 
 

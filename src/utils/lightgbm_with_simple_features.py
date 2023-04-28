@@ -20,7 +20,7 @@ import pandas as pd
 import gc
 import time
 from contextlib import contextmanager
-from lightgbm import LGBMClassifier
+#from lightgbm import LGBMClassifier
 from sklearn.metrics import roc_auc_score, roc_curve
 from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
@@ -278,7 +278,8 @@ def kfold_lightgbm(df, num_folds, stratified = False, debug= False, test=True):
     for n_fold, (train_idx, valid_idx) in enumerate(folds.split(train_df[feats], train_df['TARGET'])):
         train_x, train_y = train_df[feats].iloc[train_idx], train_df['TARGET'].iloc[train_idx]
         valid_x, valid_y = train_df[feats].iloc[valid_idx], train_df['TARGET'].iloc[valid_idx]
-
+        
+        """
         # LightGBM parameters found by Bayesian optimization
         clf = LGBMClassifier(
             nthread=4,
@@ -294,7 +295,7 @@ def kfold_lightgbm(df, num_folds, stratified = False, debug= False, test=True):
             min_child_weight=39.3259775,
             silent=-1,
             verbose=-1, )
-
+        """
         clf.fit(train_x, train_y, eval_set=[(train_x, train_y), (valid_x, valid_y)], 
             eval_metric= 'auc', verbose= 200, early_stopping_rounds= 200)
 
