@@ -2,7 +2,7 @@ Flask
 imbalanced-learn
 imblearn
 optuna
-pandas=1.3.5
+pandas==1.3.5
 panel
 plotly
 requests
