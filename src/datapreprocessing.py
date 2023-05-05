@@ -39,7 +39,7 @@ def timer(title):
     yield
     print("{} - done in {:.0f}mns".format(title, (time.time() - t0)/60))
 
-def data_process(Tables_path:Path, n_step=1, debug=False):
+def data_process(Tables_path:Path, n_step=1, data_rat=None, debug=False):
     #Recupération des données
     print("\nRecupération des données...")
     data_paths = []
@@ -141,7 +141,19 @@ def data_process(Tables_path:Path, n_step=1, debug=False):
         data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_preprocessed_final_debug_v0.csv'))
     else:
         data_preproced['SK_ID_CURR'] = SK_ID_CURR
-        data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final_v0.csv'))
+        if data_rat is not None:
+            percentage = data_rat
+            nb_class_1 = int(len(data_preproced[data_preproced.TARGET == 1])*percentage/100)
+            nb_class_0 = int(len(data_preproced[data_preproced.TARGET == 0])*percentage/100)
+            nb_class_nan = int(len(data_preproced[data_preproced.TARGET.isna()])*percentage/100)
+
+            data_preproced = pd.concat([data_preproced[data_preproced.TARGET == 1].sample(nb_class_1, random_state=42),
+                                        data_preproced[data_preproced.TARGET == 0].sample(nb_class_0, random_state=42),
+                                        data_preproced[data_preproced.TARGET.isna()].sample(nb_class_nan, random_state=42)]).reset_index(drop=True)
+            data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final_v0.csv'))
+            
+        else:
+            data_preproced.to_csv(Path(str(PROJECT_ROOT) + '/data/data_pre_processed_final_v0.csv'))
 
     print(f"Dimension des données après suppréssion des varaibles précédement ciblés : {data_preproced.shape}")
     print(f"Nombre de variables supprimées : {798 - data_preproced.shape[1]}", "\n")

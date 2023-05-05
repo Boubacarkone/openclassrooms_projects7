@@ -37,7 +37,7 @@ run(f"unzip {PROJECT_ROOT}/data/Projet+Mise+en+prod+-+home-credit-default-risk.z
 
 #Preprocess the data and save it to the folder model_and_data
 
-dp.data_process(PROJECT_ROOT + '/data/tables', 0, False)
+dp.data_process(PROJECT_ROOT + '/data/tables', 0, 10,False)
 
 #import data_preprocessed from data
 data_preprocessed = pd.read_csv(PROJECT_ROOT + '/data/data_pre_processed_final_v0.csv', index_col=[0])
