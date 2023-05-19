@@ -32,7 +32,7 @@ globa_feature_importance = pd.read_csv(PROJECT_ROOT + '/model_and_data/golbal_fe
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 
 #Get the prediction probability from the API
-def get_pred_proba(SK_ID_CURR = 100001):
+def get_pred_proba(SK_ID_CURR = 265669):
     """Get the prediction probability from the API"""
 
     url = 'http://flask-api.francecentral.cloudapp.azure.com:5000/predict'  # localhost and the defined port + endpoint
@@ -626,4 +626,4 @@ pn.state.template.param.update(
 )
 
 #panel serve --show --autoreload src/panel/dashoard.py --log-level=debug
-#python -m panel serve src/panel/dashoard.py --address 0.0.0.0 --port 8000 --allow-websocket-origin=apiproject7prediction.azurewebsites.net
+#python -m panel serve src/panel/dashoard.py --address 0.0.0.0 --port 8000 --allow-websocket-origin=p-d-dashboard.azurewebsites.net
