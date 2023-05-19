@@ -14,10 +14,10 @@ dist/
 downloads/
 eggs/
 .eggs/
+*.pkl/
 lib/
-data/
 data_dev/
-model_and_data/
+data/tables/
 model_and_data_dev/
 mlruns/
 lib64/
