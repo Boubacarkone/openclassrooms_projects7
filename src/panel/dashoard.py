@@ -1,3 +1,5 @@
+print("Deploiement du dashboard")
+
 from pstats import Stats
 import seaborn as sns
 import panel as pn
@@ -624,6 +626,7 @@ pn.Column(
 pn.state.template.param.update(
     site="Prêt à dépenser", title="Dashboard", header_background=accent_color, accent_base_color=accent_color, favicon="https://raw.githubusercontent.com/mwaskom/seaborn/master/doc/_static/favicon.ico",
 )
+
 
 #panel serve --show --autoreload src/panel/dashoard.py --log-level=debug
 #python -m panel serve src/panel/dashoard.py --address 0.0.0.0 --port 8000 --allow-websocket-origin=p-d-dashboard.azurewebsites.net
