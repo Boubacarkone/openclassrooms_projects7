@@ -1,0 +1,1 @@
+web: panel serve --address="0.0.0.0" --port=8000 src/panel/dashoard.py --allow-websocket-origin=p-a-d-dashboard.herokuapp.com
