@@ -4,6 +4,8 @@ from pstats import Stats
 import seaborn as sns
 import panel as pn
 pn.extension(loading_spinner='dots', loading_color='#00aa41', sizing_mode="stretch_width")
+pn.extension('sidebar')
+
 import plotly.express as px
 import plotly.io as pio
 import plotly.graph_objects as go
