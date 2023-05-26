@@ -251,11 +251,13 @@ def prediction_feature_importance_plot(
     return pn.Column(g_row, fig_column)
 
 
+LOGO_PATH = PROJECT_ROOT + "/src/panel/logo.png"
+print(f"\nle logo est là : {LOGO_PATH}\n")
 pn.Column(
     pn.Row(
         pn.layout.HSpacer(),
         pn.pane.PNG(
-            PROJECT_ROOT + "/src/panel/logo.png",
+            LOGO_PATH,
             #sizing_mode="fixed",
             width=240            
         ),
