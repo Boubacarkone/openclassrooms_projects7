@@ -18,4 +18,6 @@ imbalanced-learn
 imblearn
 scikit-image
 flask_restful
+hvplot
+nbconvert
 
