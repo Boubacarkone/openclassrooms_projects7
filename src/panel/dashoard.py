@@ -257,7 +257,7 @@ pn.Column(
     pn.Row(
         pn.layout.HSpacer(),
         pn.pane.PNG(
-            LOGO_PATH,
+            'https://assets.holoviz.org/panel/samples/png_sample.png',
             #sizing_mode="fixed",
             width=240            
         ),
