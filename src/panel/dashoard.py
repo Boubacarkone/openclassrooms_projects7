@@ -108,8 +108,8 @@ def prediction_feature_importance_plot(
         accent_color=accent_color,
         colorscale="Viridis",
         ):
-    print(f"SK_ID_CURR : {int(SK_ID_CURR)}")
-    res = get_pred_proba(int(SK_ID_CURR))
+    print(f"SK_ID_CURR : {SK_ID_CURR}")
+    res = get_pred_proba(SK_ID_CURR)
     local_feature_importance = pd.DataFrame(res['local_explainer_df'])
     trust_rate = res['Trust rate']
     g = gauge_plot(trust_rate)
