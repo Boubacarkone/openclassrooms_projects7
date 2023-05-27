@@ -23,6 +23,9 @@ import sys
 from pathlib import Path
 import requests
 
+# import display
+from IPython.display import display
+
 
 
 
@@ -53,8 +56,13 @@ def get_pred_proba(SK_ID_CURR = 265669):
         return response.text
 
 #import test_df_not_norm data for the prediction
-test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
+test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0], sep=',', encoding='utf-8', decimal='.')
+print(test_df_not_norm.shape, "\n")
+display(test_df_not_norm.head())
+
 SK_ID_CURR_list = [x for x in test_df_not_norm.sort_index().index.tolist()]
+print(len(SK_ID_CURR_list), "\n")
+print(SK_ID_CURR_list[:5], "\n")
 
 
 pn.extension(sizing_mode="stretch_width", template="fast")
