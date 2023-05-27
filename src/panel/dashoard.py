@@ -41,9 +41,12 @@ def get_pred_proba(SK_ID_CURR = 265669):
     url = 'http://flask-api.francecentral.cloudapp.azure.com:5000/predict'  # localhost and the defined port + endpoint
     
     data = {'SK_ID_CURR': str(SK_ID_CURR)}
+    print(data, "\n")
 
     response = requests.post(url, data=data)
-    print(response.text)
+    print(len(response.text), type(response.text), "\n")
+    print(response.text, "\n")
+    
     
     return response.json()
 
