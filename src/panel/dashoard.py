@@ -56,7 +56,7 @@ def get_pred_proba(SK_ID_CURR = 265669):
         return response.text
 
 #import test_df_not_norm data for the prediction
-test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0], sep=',', encoding='utf-8', decimal='.')
+test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv')
 print(test_df_not_norm.shape, "\n")
 display(test_df_not_norm.head())
 
@@ -358,6 +358,7 @@ df_description = pd.read_csv(PROJECT_ROOT + "/data/tables/HomeCredit_columns_des
 
 # Import cat_df.csv file
 cat_df = pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
+print(f"\n cat_df.shape : {cat_df.shape}\n")
 
 #Create a list of features
 feature_names = list(df_description.Row)
@@ -369,6 +370,7 @@ cat_feature_names.remove('Dif_count')
 #Import test_df_not_norm_not_norm.csv file and train_df_not_norm.csv file
 test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
 train_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/train_df_not_norm.csv', index_col=[0])
+print(f"\n test_df_not_norm.shape : {test_df_not_norm.shape}\n")
 
 
 #Create a list of numerical features
