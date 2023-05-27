@@ -4,7 +4,6 @@ from pstats import Stats
 import seaborn as sns
 import panel as pn
 pn.extension(loading_spinner='dots', loading_color='#00aa41', sizing_mode="stretch_width")
-pn.extension('sidebar')
 
 import plotly.express as px
 import plotly.io as pio
@@ -41,9 +40,10 @@ def get_pred_proba(SK_ID_CURR = 265669):
 
     url = 'http://flask-api.francecentral.cloudapp.azure.com:5000/predict'  # localhost and the defined port + endpoint
     
-    data = {'SK_ID_CURR': SK_ID_CURR}
+    data = {'SK_ID_CURR': str(SK_ID_CURR)}
 
     response = requests.post(url, data=data)
+    print(response.text)
     
     return response.json()
 
@@ -102,13 +102,13 @@ def gauge_plot(trust_rate = 0):
 #ploting the local feature importance
 #ploting the local feature importance with plotly
 def prediction_feature_importance_plot(
-        SK_ID_CURR = '100001',
+        SK_ID_CURR = '265669',
         nb_features = 15,
         template="simple_white",
         accent_color=accent_color,
         colorscale="Viridis",
         ):
-    
+    print(f"SK_ID_CURR : {int(SK_ID_CURR)}")
     res = get_pred_proba(int(SK_ID_CURR))
     local_feature_importance = pd.DataFrame(res['local_explainer_df'])
     trust_rate = res['Trust rate']
@@ -632,5 +632,5 @@ pn.state.template.param.update(
 )
 
 
-#panel serve --show --autoreload src/panel/dashoard.py --log-level=debug
+#panel serve --show --autoreload src/panel/dashoard.py --log-level=debug --port=8000
 #python -m panel serve src/panel/dashoard.py --address 0.0.0.0 --port 8000 --allow-websocket-origin=p-d-dashboard.azurewebsites.net
