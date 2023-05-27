@@ -47,12 +47,14 @@ def get_pred_proba(SK_ID_CURR = 265669):
     print(len(response.text), type(response.text), "\n")
     print(response.text, "\n")
     
-    
-    return response.json()
+    try:
+        return response.json()
+    except:
+        return response.text
 
 #import test_df_not_norm data for the prediction
 test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
-SK_ID_CURR_list = [str(x) for x in test_df_not_norm.sort_index().index.tolist()]
+SK_ID_CURR_list = [x for x in test_df_not_norm.sort_index().index.tolist()]
 
 
 pn.extension(sizing_mode="stretch_width", template="fast")
@@ -113,6 +115,10 @@ def prediction_feature_importance_plot(
         ):
     print(f"SK_ID_CURR : {SK_ID_CURR}")
     res = get_pred_proba(SK_ID_CURR)
+
+    if type(res) == str:
+        return pn.pane.Markdown(res)
+    
     local_feature_importance = pd.DataFrame(res['local_explainer_df'])
     trust_rate = res['Trust rate']
     g = gauge_plot(trust_rate)
@@ -283,13 +289,13 @@ colorscales = px.colors.named_colorscales()
 colorscale = pn.widgets.Select(name="Select a color Palette", value="Viridis" ,options=colorscales)#.servable(target="sidebar")
 
 slider_range = pn.widgets.EditableRangeSlider(name="Range", start=0, end=len(SK_ID_CURR_list), value=(0, 1000), step=1000, width=900)
-SK_ID_CURR = pn.widgets.Select(value=str(SK_ID_CURR_list[0]), options=SK_ID_CURR_list[0:1000], width=120)
+SK_ID_CURR = pn.widgets.Select(value=SK_ID_CURR_list[0], options=SK_ID_CURR_list[0:1000], width=120)
 
 #update SK_ID_CURR when slider_range is changed
 @pn.depends(slider_range.param.value, watch=True)
 def update_SK_ID_CURR(value):
     SK_ID_CURR.options = SK_ID_CURR_list[value[0]:value[1]]
-    SK_ID_CURR.value = str(SK_ID_CURR_list[value[0]])
+    SK_ID_CURR.value = SK_ID_CURR_list[value[0]]
 
 
 pn.Row(
