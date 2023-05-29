@@ -56,6 +56,7 @@ def get_pred_proba(SK_ID_CURR = 265669):
         return response.text
 
 #import test_df_not_norm data for the prediction
+print("\n", Path('../model_and_data/test_df_not_norm.csv').resolve(), "\n")
 test_df_not_norm = pd.read_csv(Path('../model_and_data/test_df_not_norm.csv').resolve(), index_col=[0])
 print(test_df_not_norm.shape, "\n")
 display(test_df_not_norm.head())
