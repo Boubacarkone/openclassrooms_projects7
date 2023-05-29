@@ -33,7 +33,7 @@ PROJECT_ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = str(PROJECT_ROOT.parent.parent)
 
 #Import the golbal_feature_importance data from the folder model_and_data
-globa_feature_importance = pd.read_csv(PROJECT_ROOT + '/model_and_data/golbal_feature_importance.csv', index_col=[0])
+globa_feature_importance = pd.read_csv(Path('../model_and_data/golbal_feature_importance.csv').resolve(), index_col=[0])
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 
@@ -56,7 +56,7 @@ def get_pred_proba(SK_ID_CURR = 265669):
         return response.text
 
 #import test_df_not_norm data for the prediction
-test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv')
+test_df_not_norm = pd.read_csv(Path('../model_and_data/test_df_not_norm.csv').resolve(), index_col=[0])
 print(test_df_not_norm.shape, "\n")
 display(test_df_not_norm.head())
 
