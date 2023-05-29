@@ -369,6 +369,7 @@ cat_feature_names.remove('Dif_count')
 
 #Import test_df_not_norm_not_norm.csv file and train_df_not_norm.csv file
 test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
+print(f"\n test_df_not_norm.shape : {test_df_not_norm.shape}\n")
 train_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/train_df_not_norm.csv', index_col=[0])
 print(f"\n test_df_not_norm.shape : {test_df_not_norm.shape}\n")
 
