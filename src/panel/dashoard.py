@@ -36,7 +36,10 @@ PROJECT_ROOT = str(PROJECT_ROOT.parent.parent)
 def read_csv_from_azure(relatif_path:str):
 
     # URL SAP de l'objet blob
-    sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/" + relatif_path
+    if 'data' in relatif_path:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboard/" + relatif_path
+    else:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/" + relatif_path
 
     # Récupération du fichier csv
     r = requests.get(sap_blob_url)
@@ -369,7 +372,7 @@ pn.Row(
 ).servable()
 
 #Import HomeCredit_columns_description.csv file
-df_description = read_csv_from_azure('HomeCredit_columns_description.csv')
+df_description = read_csv_from_azure('/data/tables/HomeCredit_columns_description.csv')
 #pd.read_csv(PROJECT_ROOT + "/data/tables/HomeCredit_columns_description.csv", encoding="ISO-8859-1", index_col=[0])
 
 # Import cat_df.csv file
