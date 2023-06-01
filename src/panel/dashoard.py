@@ -33,8 +33,8 @@ PROJECT_ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = str(PROJECT_ROOT.parent.parent)
 
 #Import the golbal_feature_importance data from the folder model_and_data
-print(Path('./model_and_data/golbal_feature_importance.csv'))
-globa_feature_importance = pd.read_csv(Path('./model_and_data/golbal_feature_importance.csv'), index_col=[0])
+print(f"File_paht : {Path('../../model_and_data/golbal_feature_importance.csv')}")
+globa_feature_importance = pd.read_csv(Path('../../model_and_data/golbal_feature_importance.csv'), index_col=[0])
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 
