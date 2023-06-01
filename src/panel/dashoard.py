@@ -22,6 +22,7 @@ import os
 import sys
 from pathlib import Path
 import requests
+from io import StringIO
 
 # import display
 from IPython.display import display
@@ -32,9 +33,21 @@ from IPython.display import display
 PROJECT_ROOT = Path(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_ROOT = str(PROJECT_ROOT.parent.parent)
 
-#Import the golbal_feature_importance data from the folder model_and_data
-print(f"File_paht : {Path('../../model_and_data/golbal_feature_importance.csv')}")
-globa_feature_importance = pd.read_csv(Path('../../model_and_data/golbal_feature_importance.csv'), index_col=[0])
+def read_csv_from_azure(relatif_path:str):
+
+    # URL SAP de l'objet blob
+    sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/" + relatif_path
+
+    # Récupération du fichier csv
+    r = requests.get(sap_blob_url)
+
+    # Création du dataframe
+    df = pd.read_csv(StringIO(r.text), index_col=[0])
+    return df
+
+
+globa_feature_importance = read_csv_from_azure('golbal_feature_importance.csv')
+#pd.read_csv(Path('../../model_and_data/golbal_feature_importance.csv'), index_col=[0])
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 
@@ -57,8 +70,8 @@ def get_pred_proba(SK_ID_CURR = 265669):
         return response.text
 
 #import test_df_not_norm data for the prediction
-print("\n", Path('../model_and_data/test_df_not_norm.csv').resolve(), "\n")
-test_df_not_norm = pd.read_csv(Path('../model_and_data/test_df_not_norm.csv').resolve(), index_col=[0])
+test_df_not_norm = read_csv_from_azure('test_df_not_norm.csv')
+#pd.read_csv(Path('../model_and_data/test_df_not_norm.csv').resolve(), index_col=[0])
 print(test_df_not_norm.shape, "\n")
 display(test_df_not_norm.head())
 
@@ -356,10 +369,12 @@ pn.Row(
 ).servable()
 
 #Import HomeCredit_columns_description.csv file
-df_description = pd.read_csv(PROJECT_ROOT + "/data/tables/HomeCredit_columns_description.csv", encoding="ISO-8859-1", index_col=[0])
+df_description = read_csv_from_azure('HomeCredit_columns_description.csv')
+#pd.read_csv(PROJECT_ROOT + "/data/tables/HomeCredit_columns_description.csv", encoding="ISO-8859-1", index_col=[0])
 
 # Import cat_df.csv file
-cat_df = pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
+cat_df = read_csv_from_azure('cat_df.csv')
+#pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
 print(f"\n cat_df.shape : {cat_df.shape}\n")
 
 #Create a list of features
@@ -370,9 +385,11 @@ cat_feature_names = list(cat_df.columns)
 cat_feature_names.remove('Dif_count')
 
 #Import test_df_not_norm_not_norm.csv file and train_df_not_norm.csv file
-test_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
+test_df_not_norm = read_csv_from_azure('test_df_not_norm.csv')
+#pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df_not_norm.csv', index_col=[0])
 print(f"\n test_df_not_norm.shape : {test_df_not_norm.shape}\n")
-train_df_not_norm = pd.read_csv(PROJECT_ROOT + '/model_and_data/train_df_not_norm.csv', index_col=[0])
+train_df_not_norm = read_csv_from_azure('train_df_not_norm.csv')
+#pd.read_csv(PROJECT_ROOT + '/model_and_data/train_df_not_norm.csv', index_col=[0])
 print(f"\n test_df_not_norm.shape : {test_df_not_norm.shape}\n")
 
 
