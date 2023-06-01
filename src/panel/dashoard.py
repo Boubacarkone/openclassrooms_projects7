@@ -65,7 +65,7 @@ def get_pred_proba(SK_ID_CURR = 265669):
 
     response = requests.post(url, data=data)
     print(len(response.text), type(response.text), "\n")
-    print(response.text, "\n")
+    #print(response.text, "\n")
     
     try:
         return response.json()
