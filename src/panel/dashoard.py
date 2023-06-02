@@ -134,14 +134,14 @@ def gauge_plot(trust_rate = 0):
 #ploting the local feature importance
 #ploting the local feature importance with plotly
 def prediction_feature_importance_plot(
-        SK_ID_CURR = '265669',
-        local_feature_importance_show = False,
-        nb_features = 15,
-        template="simple_white",
-        accent_color=accent_color,
-        colorscale="Viridis",
-        ):
-    
+    SK_ID_CURR = '265669',
+    local_feature_importance_show = False,
+    nb_features = 15,
+    template="simple_white",
+    accent_color=accent_color,
+    colorscale="Viridis",
+    ):
+
 
     
     if local_feature_importance_show:
@@ -150,8 +150,12 @@ def prediction_feature_importance_plot(
 
         local_feature_importance = pd.DataFrame(res['local_explainer_df'])
 
-        df = local_feature_importance
-        df = df.sort_values('Importance', ascending=True)[-nb_features:]
+        
+        df = local_feature_importance#[:nb_features]
+        #print(df.shape)
+        df.sort_values(by='abs_values', ascending=True, inplace=True)
+        df = df[-nb_features:]
+        #print(df.shape)
         df['Importance'] = df['Importance'].round(3)
         
         #Bar plot with go
@@ -159,17 +163,17 @@ def prediction_feature_importance_plot(
 
             data=[
                 go.Bar(
-                    x=df[-nb_features:]['Importance'],
-                    y=df[-nb_features:]['Feature'],
+                    x=df['Importance'],
+                    y=df['Feature'],
                     orientation="h",
-                    text=df[-nb_features:]['Importance'].astype(str),
+                    text=df['Importance'].astype(str),
                     textposition='auto',
                     textfont=dict(
                         family="sans serif",
                         size=14,
                     ),
                     marker=dict(
-                        color=df[-nb_features:]['Importance'],
+                        color=df['Importance'],
                         colorscale=colorscale,
                     ),
                     hovertemplate = "%{text}",
@@ -393,7 +397,10 @@ pn.Row(
 
 #Import HomeCredit_columns_description.csv file
 df_description = read_csv_from_azure('data/tables/HomeCredit_columns_description.csv')
+df_description = df_description.reset_index()
 #pd.read_csv(PROJECT_ROOT + "/data/tables/HomeCredit_columns_description.csv", encoding="ISO-8859-1", index_col=[0])
+print(f"\n df_description.shape : {df_description.shape}\n")
+print(f"\n df_description.columns : {df_description.columns}\n")
 
 # Import cat_df.csv file
 cat_df = read_csv_from_azure('cat_df.csv')
@@ -402,6 +409,7 @@ print(f"\n cat_df.shape : {cat_df.shape}\n")
 
 #Create a list of features
 feature_names = list(df_description.Row)
+print(f"\n feature_names : {len(feature_names)}\n")
 
 #Create a list of categorical features
 cat_feature_names = list(cat_df.columns)
@@ -438,11 +446,12 @@ def toggle_group_callback(toggle_group):
         def autocomplete_callback(autocomplete):
 
             try:
-                row = df_description.loc[df_description['Row'] == autocomplete]
+                row = df_description.loc[df_description.Row == autocomplete]
+                print(row)
                 description = row['Description'].values[0]
                 table = row['Table'].values[0]
                 special = row['Special'].values[0]
-
+                print("debug:" ,description,"\n", table, "\n", special,  "\nEnd debug")
                 card = pn.Card(
                     pn.pane.Markdown(f"""
                     ## {autocomplete}
@@ -466,10 +475,10 @@ def toggle_group_callback(toggle_group):
                     },
                 )
                 return card
-            except:
+            except Exception as e:
                 return pn.pane.Markdown(f"""
                 ## {autocomplete}
-                ### Description: Feature not found
+                ### Description: Feature not found : {e}
                 """, sizing_mode="stretch_width")
         
         return pn.Column(
