@@ -60,12 +60,12 @@ def get_pred_proba(SK_ID_CURR = 265669, local_feature_importance_show=False):
 
     url = 'http://flask-api.francecentral.cloudapp.azure.com:5000/predict'  # localhost and the defined port + endpoint
     
-    data = {'SK_ID_CURR': SK_ID_CURR, 'local_feature_importance_show': True}
+    data = {'SK_ID_CURR': SK_ID_CURR, 'local_feature_importance_show': local_feature_importance_show}
     
     print(data, "\n")
 
     response = requests.post(url, data=data)
-    print(len(response.text), type(response.text), "\n")
+    #print(len(response.text), type(response.text), "\n")
     #print(response.text, "\n")
     
     try:
@@ -135,6 +135,7 @@ def gauge_plot(trust_rate = 0):
 #ploting the local feature importance with plotly
 def prediction_feature_importance_plot(
         SK_ID_CURR = '265669',
+        local_feature_importance_show = False,
         nb_features = 15,
         template="simple_white",
         accent_color=accent_color,
@@ -142,8 +143,6 @@ def prediction_feature_importance_plot(
         ):
     
 
-    #Create a button to calculate the local feature importance
-    local_feature_importance_show = pn.widgets.Button(name='Calculate Local feature importance', button_type='primary', width=200)
     
     if local_feature_importance_show:
         print(f"SK_ID_CURR : {SK_ID_CURR}")
@@ -301,7 +300,7 @@ def prediction_feature_importance_plot(
     )
 
 
-    fig_column = pn.Row(local_feature_importance_show ,local_feature_importance_column, global_feature_importance_column)
+    fig_column = pn.Row(local_feature_importance_column, global_feature_importance_column)
     return pn.Column(g_row, fig_column)
 
 
@@ -320,6 +319,8 @@ pn.Column(
     pn.Row(pn.pane.Markdown('# Control Panel:'))
 ).servable(target="sidebar")
 
+#Create a checkbox to choose show local feature importance or not
+local_feature_importance_show = pn.widgets.Checkbox(name="Show local feature importance", value=False).servable(target="sidebar")
 
 plotly_template = pn.widgets.Select(name="Select a Plotly Template", options=sorted(pio.templates))#.servable(target="sidebar")
 
@@ -370,6 +371,7 @@ prediction_feature_importance_plot = pn.bind(
     template=plotly_template,
     accent_color=accent_color,
     colorscale=colorscale,
+    local_feature_importance_show=local_feature_importance_show,
     )
 
 layout = pn.Column(prediction_feature_importance_plot, sizing_mode="stretch_width")
