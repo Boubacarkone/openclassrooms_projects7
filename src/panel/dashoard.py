@@ -140,7 +140,7 @@ def prediction_feature_importance_plot(
         colorscale="Viridis",
         ):
     print(f"SK_ID_CURR : {SK_ID_CURR}")
-    res = get_pred_proba(SK_ID_CURR+3454)
+    res = get_pred_proba(SK_ID_CURR)
 
     if type(res) == str:
         return pn.pane.Markdown(res)
