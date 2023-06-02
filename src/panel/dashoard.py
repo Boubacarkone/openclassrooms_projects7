@@ -150,55 +150,62 @@ def prediction_feature_importance_plot(
     g = gauge_plot(trust_rate)
 
     df = local_feature_importance
-    df['Importance'] = df['Importance'].round(3)
-    
-    #Bar plot with go
-    local_feature_importance = go.Figure(
+    if df.shape[0] != 0:
+        
+        df['Importance'] = df['Importance'].round(3)
+        
+        #Bar plot with go
+        local_feature_importance = go.Figure(
 
-        data=[
-            go.Bar(
-                x=df[-nb_features:]['Importance'],
-                y=df[-nb_features:]['Feature'],
-                orientation="h",
-                text=df[-nb_features:]['Importance'].astype(str),
-                textposition='auto',
-                textfont=dict(
-                    family="sans serif",
-                    size=14,
+            data=[
+                go.Bar(
+                    x=df[-nb_features:]['Importance'],
+                    y=df[-nb_features:]['Feature'],
+                    orientation="h",
+                    text=df[-nb_features:]['Importance'].astype(str),
+                    textposition='auto',
+                    textfont=dict(
+                        family="sans serif",
+                        size=14,
+                    ),
+                    marker=dict(
+                        color=df[-nb_features:]['Importance'],
+                        colorscale=colorscale,
+                    ),
+                    hovertemplate = "%{text}",
+                )
+            ],
+            layout=go.Layout(
+                #title=f"Local feature importance for client {SK_ID_CURR}",
+                template=template,
+                margin=dict(l=0, r=0, t=50, b=0),
+                xaxis=dict(
+                    title="Local Importance",
+                    showgrid=False,
+                    showline=True,
+                    showticklabels=True,
+                    zeroline=True,
+                    linewidth=4,
+                    ticks='outside',
                 ),
-                marker=dict(
-                    color=df[-nb_features:]['Importance'],
-                    colorscale=colorscale,
+                yaxis=dict(
+                    title="Feature",
+                    showgrid=False,
+                    showline=True,
+                    showticklabels=True,
+                    zeroline=False,
+                    linewidth=2,
+                    ticks='outside',
                 ),
-                hovertemplate = "%{text}",
             )
-        ],
-        layout=go.Layout(
-            #title=f"Local feature importance for client {SK_ID_CURR}",
-            template=template,
-            margin=dict(l=0, r=0, t=50, b=0),
-            xaxis=dict(
-                title="Local Importance",
-                showgrid=False,
-                showline=True,
-                showticklabels=True,
-                zeroline=True,
-                linewidth=4,
-                ticks='outside',
-            ),
-            yaxis=dict(
-                title="Feature",
-                showgrid=False,
-                showline=True,
-                showticklabels=True,
-                zeroline=False,
-                linewidth=2,
-                ticks='outside',
-            ),
         )
-    )
 
-    local_feature_importance.layout.autosize = True
+        local_feature_importance.layout.autosize = True
+
+    else:
+        local_feature_importance = pn.pane.Markdown(f"""
+        ## No local feature importance for client {SK_ID_CURR}\nclick on the local feature importance button to calculate it.
+        """, sizing_mode="stretch_width")
 
     df = globa_feature_importance.sort_values('Importance', ascending=True)[-nb_features:]
     df['Importance'] = df['Importance'].round(3)
