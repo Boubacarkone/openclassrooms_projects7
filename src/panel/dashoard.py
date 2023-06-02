@@ -55,12 +55,13 @@ globa_feature_importance = read_csv_from_azure('golbal_feature_importance.csv')
 #"/Users/kone/Desktop/Oc_Formation/Projets/Projet7/openclassrooms_projects7/model_and_data/golbal_feature_importance.csv"
 
 #Get the prediction probability from the API
-def get_pred_proba(SK_ID_CURR = 265669):
+def get_pred_proba(SK_ID_CURR = 265669, local_feature_importance_show=False):
     """Get the prediction probability from the API"""
 
     url = 'http://flask-api.francecentral.cloudapp.azure.com:5000/predict'  # localhost and the defined port + endpoint
     
-    data = {'SK_ID_CURR': SK_ID_CURR}
+    data = {'SK_ID_CURR': SK_ID_CURR, 'local_feature_importance_show': True}
+    
     print(data, "\n")
 
     response = requests.post(url, data=data)
@@ -139,19 +140,19 @@ def prediction_feature_importance_plot(
         accent_color=accent_color,
         colorscale="Viridis",
         ):
-    print(f"SK_ID_CURR : {SK_ID_CURR}")
-    res = get_pred_proba(SK_ID_CURR)
-
-    if type(res) == str:
-        return pn.pane.Markdown(res)
     
-    local_feature_importance = pd.DataFrame(res['local_explainer_df'])
-    trust_rate = res['Trust rate']
-    g = gauge_plot(trust_rate)
 
-    df = local_feature_importance
-    if df.shape[0] != 0:
-        
+    #Create a button to calculate the local feature importance
+    local_feature_importance_show = pn.widgets.Button(name='Calculate Local feature importance', button_type='primary', width=200)
+    
+    if local_feature_importance_show:
+        print(f"SK_ID_CURR : {SK_ID_CURR}")
+        res = get_pred_proba(SK_ID_CURR, local_feature_importance_show)
+
+        local_feature_importance = pd.DataFrame(res['local_explainer_df'])
+
+        df = local_feature_importance
+        df = df.sort_values('Importance', ascending=True)[-nb_features:]
         df['Importance'] = df['Importance'].round(3)
         
         #Bar plot with go
@@ -201,11 +202,18 @@ def prediction_feature_importance_plot(
         )
 
         local_feature_importance.layout.autosize = True
-
     else:
+        res = get_pred_proba(SK_ID_CURR)
         local_feature_importance = pn.pane.Markdown(f"""
-        ## No local feature importance for client {SK_ID_CURR}\nclick on the local feature importance button to calculate it.
+        ## No local feature importance for client {SK_ID_CURR}
+        click on the local feature importance button to calculate it.
         """, sizing_mode="stretch_width")
+
+    if type(res) == str:
+        return pn.pane.Markdown(res)
+    
+    trust_rate = res['Trust rate']
+    g = gauge_plot(trust_rate)
 
     df = globa_feature_importance.sort_values('Importance', ascending=True)[-nb_features:]
     df['Importance'] = df['Importance'].round(3)
@@ -291,7 +299,9 @@ def prediction_feature_importance_plot(
             margin=(0, 0, 0, 0))), 
         pn.Row(global_feature_importance_plot)
     )
-    fig_column = pn.Row(local_feature_importance_column, global_feature_importance_column)
+
+
+    fig_column = pn.Row(local_feature_importance_show ,local_feature_importance_column, global_feature_importance_column)
     return pn.Column(g_row, fig_column)
 
 
@@ -339,6 +349,7 @@ pn.Row(
 ).servable()
 
 nb_features = pn.widgets.IntSlider(name="Number of Features", value=15, start=10, end=100, step=5)#.servable(target="sidebar")
+
 
 #pn.Column(style, palette, font, nb_features, sizing_mode="stretch_width")#.servable(target="sidebar")
 
