@@ -27,8 +27,8 @@ jobs:
       # par exemple, la formation du modèle, la génération des fichiers nécessaires, etc.
 
       - name: Run tests
-       run: |
-         python -m pytest  src/app_test.py
+        run: |
+          python -m pytest src/app_test.py
 
   deploy:
     needs: build
