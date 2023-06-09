@@ -54,6 +54,7 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: p-a-d-dashboard
           heroku_email: "boubacarkone.49@gmail.com"
+          branch: Dashboard
 
-      # - name: Deploy to Heroku
-      #   run: git push heroku HEAD:main
+       - name: Deploy to Heroku
+         run: git push heroku HEAD:main
