@@ -44,9 +44,9 @@ jobs:
           python-version: 3.9.16
 
       - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+         run: |
+           python -m pip install --upgrade pip
+           pip install -r requirements.txt
 
       - name: Login to Heroku
         uses: akhileshns/heroku-deploy@v3.12.12
@@ -54,7 +54,7 @@ jobs:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: p-a-d-dashboard
           heroku_email: "boubacarkone.49@gmail.com"
-          branch: Dashboard
+          branch: "Dashboard"
 
-       - name: Deploy to Heroku
+      - name: Deploy to Heroku
          run: git push heroku HEAD:main
