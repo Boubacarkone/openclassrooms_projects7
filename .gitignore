@@ -17,8 +17,10 @@ eggs/
 *.pkl/
 lib/
 data_dev/
+data/
 data/tables/
 model_and_data_dev/
+model_and_data/
 mlruns/
 lib64/
 parts/
