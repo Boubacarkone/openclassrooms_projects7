@@ -209,13 +209,19 @@ def prediction_feature_importance_plot(
         res = get_pred_proba(SK_ID_CURR)
         local_feature_importance = pn.pane.Markdown(f"""
         ## No local feature importance for client {SK_ID_CURR}
-        click on the local feature importance button to calculate it.
+        Check the local feature importance box in the right sidebar to display the graph.
+        Note: calculation takes time (about 40 seconds)
         """, sizing_mode="stretch_width")
 
     if type(res) == str:
         return pn.pane.Markdown(res)
     
     trust_rate = res['Trust rate']
+    if trust_rate >= 80:
+        accepatance = "The loan is accepted!"
+    elif trust_rate:
+        accepatance = "The loan is refused!"
+
     g = gauge_plot(trust_rate)
 
     df = globa_feature_importance.sort_values('Importance', ascending=True)[-nb_features:]
@@ -272,11 +278,13 @@ def prediction_feature_importance_plot(
     #fig.layout.plot_bgcolor = accent_color 
     g_row = pn.Row(
         pn.pane.Markdown(
-        """
+        f"""
         # The Gauge indicates the score obtained by the customer:
         - Red ==> Low Score (High default risk)
         - Gold ==> Average Score (Average Default Risk)
         - Green ==> High Score (Low risk of default)
+
+        ## The Trust rate is: {trust_rate}% ==> {accepatance}
         """,
         margin=(0, 0, 0, 0)
         ),
@@ -286,7 +294,7 @@ def prediction_feature_importance_plot(
         pn.Row(
             pn.pane.Markdown(
                 """
-                ## The most influential Features for calculating the Customer Score:
+                ## The most influential Features for calculating the Client Score:
                 Features with a negative value decrease the probability that the customer is in default of payment while a positive value increases this probability.
                 """, margin=(0, 0, 0, 0))
             ),
@@ -403,7 +411,7 @@ print(f"\n df_description.shape : {df_description.shape}\n")
 print(f"\n df_description.columns : {df_description.columns}\n")
 
 # Import cat_df.csv file
-cat_df = read_csv_from_azure('cat_df.csv')
+cat_df = ('cat_df.cread_csv_from_azuresv')
 #pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
 print(f"\n cat_df.shape : {cat_df.shape}\n")
 
