@@ -209,8 +209,8 @@ def prediction_feature_importance_plot(
         res = get_pred_proba(SK_ID_CURR)
         local_feature_importance = pn.pane.Markdown(f"""
         ## No local feature importance for client {SK_ID_CURR}
-        Check the local feature importance box in the right sidebar to display the graph.
-        Note: calculation takes time (about 40 seconds)
+        ### Check the local feature importance box in the right sidebar to display the graph.
+        ### Note: calculation takes time (about 40 seconds)
         """, sizing_mode="stretch_width")
 
     if type(res) == str:
@@ -279,12 +279,12 @@ def prediction_feature_importance_plot(
     g_row = pn.Row(
         pn.pane.Markdown(
         f"""
-        # The Gauge indicates the score obtained by the customer:
+        # The Gauge indicates the score obtained by the Client:
         - Red ==> Low Score (High default risk)
         - Gold ==> Average Score (Average Default Risk)
         - Green ==> High Score (Low risk of default)
 
-        ## The Trust rate is: {trust_rate}% ==> {accepatance}
+        ## The Trust rate is: {trust_rate}% : {accepatance}
         """,
         margin=(0, 0, 0, 0)
         ),
@@ -295,7 +295,7 @@ def prediction_feature_importance_plot(
             pn.pane.Markdown(
                 """
                 ## The most influential Features for calculating the Client Score:
-                Features with a negative value decrease the probability that the customer is in default of payment while a positive value increases this probability.
+                Features with a negative value decrease the probability that the Client is in default of payment while a positive value increases this probability.
                 """, margin=(0, 0, 0, 0))
             ),
         pn.Row(local_feature_importance)
@@ -305,7 +305,7 @@ def prediction_feature_importance_plot(
         pn.Row(pn.pane.Markdown(
             """
             ## Global feature importance :
-            ## The most important features for the model to predict the default risk of a customer.
+            ## The most important features for the model to predict the default risk of a Client.
             """, 
             margin=(0, 0, 0, 0))), 
         pn.Row(global_feature_importance_plot)
@@ -355,8 +355,8 @@ def update_SK_ID_CURR(value):
 
 
 pn.Row(
-    pn.Column(pn.pane.Markdown('## Select a range of customers ID'), slider_range),# sizing_mode="stretch_width"),
-    pn.Column(pn.pane.Markdown('## Select a customer ID'), SK_ID_CURR, sizing_mode="stretch_width"),
+    pn.Column(pn.pane.Markdown('## Select a range of Clients ID'), slider_range),# sizing_mode="stretch_width"),
+    pn.Column(pn.pane.Markdown('## Select a Client ID'), SK_ID_CURR, sizing_mode="stretch_width"),
     sizing_mode="stretch_width"
 
 ).servable()
@@ -411,7 +411,7 @@ print(f"\n df_description.shape : {df_description.shape}\n")
 print(f"\n df_description.columns : {df_description.columns}\n")
 
 # Import cat_df.csv file
-cat_df = ('cat_df.cread_csv_from_azuresv')
+cat_df = read_csv_from_azure('cat_df.cread_csv_from_azuresv')
 #pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
 print(f"\n cat_df.shape : {cat_df.shape}\n")
 
