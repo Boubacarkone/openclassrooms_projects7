@@ -411,7 +411,7 @@ print(f"\n df_description.shape : {df_description.shape}\n")
 print(f"\n df_description.columns : {df_description.columns}\n")
 
 # Import cat_df.csv file
-cat_df = read_csv_from_azure('cat_df.cread_csv_from_azuresv')
+cat_df = read_csv_from_azure('cat_df.csv')
 #pd.read_csv(PROJECT_ROOT + '/model_and_data/cat_df.csv', index_col=[0])
 print(f"\n cat_df.shape : {cat_df.shape}\n")
 
