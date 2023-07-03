@@ -1,7 +1,7 @@
 flask==2.0.3
 optuna==2.10.0
 pandas==1.3.5
-panel==0.12.1
+panel==0.14.2
 plotly==5.13.1
 requests==2.28.1
 scipy==1.7.1
@@ -10,11 +10,19 @@ tqdm==4.62.3
 IPython==8.12
 numpy==1.21.2
 matplotlib==3.5.0
+flask-cors==3.0.10
+jinja2==3.0.3
+pytest==7.3.1
 scikit-learn
 lightgbm
 lime
 imbalanced-learn
 imblearn
 scikit-image
+flask_restful
+hvplot
+nbconvert
+gunicorn
 
 
+# Install the required packages
