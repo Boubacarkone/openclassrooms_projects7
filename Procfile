@@ -1,1 +1,1 @@
-web: web: gunicorn gretting:app
+web: flask db upgrade; gunicorn gretting:app
