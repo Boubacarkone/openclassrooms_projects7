@@ -23,6 +23,7 @@ flask_restful
 hvplot
 nbconvert
 gunicorn
+greetings
 
 
 # Install the required packages
