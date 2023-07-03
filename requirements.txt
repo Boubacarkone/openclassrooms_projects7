@@ -22,4 +22,5 @@ scikit-image
 flask_restful
 hvplot
 nbconvert
+gunicorn
 
