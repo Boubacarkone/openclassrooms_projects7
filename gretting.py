@@ -4,8 +4,9 @@ app = Flask(__name__)
 
 @app.route('/getmsg/', methods=['GET'])
 def respond():
-    # Retrieve the name from the url parameter /getmsg/?name=
+    # Retrieve the name and first_name from the url parameter /getmsg/?name=
     name = request.args.get("name", None)
+    first_name = request.args.get("first_name", None)
 
     # For debugging
     print(f"Received: {name}")
@@ -19,7 +20,7 @@ def respond():
     elif str(name).isdigit():
         response["ERROR"] = "The name can't be numeric. Please send a string."
     else:
-        response["MESSAGE"] = f"Welcome {name} to our awesome API!"
+        response["MESSAGE"] = f"Welcome {name}, {first_name} to our awesome API!"
 
     # Return the response in json format
     return jsonify(response)
