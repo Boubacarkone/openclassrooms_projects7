@@ -28,14 +28,14 @@ def read_csv_from_azure(relatif_path:str):
 # data:
 # for debug:
 print("Loading data...")
-X_train = read_csv_from_azure("X_train.csv")
-print("X_train loaded", X_train.shape)
-X_test = read_csv_from_azure("X_test.csv")
-print("X_test loaded", X_test.shape)
-y_train = read_csv_from_azure("y_train.csv")
-print("y_train loaded", y_train.shape)
-y_test = read_csv_from_azure("y_test.csv")
-print("y_test loaded", y_test.shape)
+# X_train = read_csv_from_azure("X_train.csv")
+# print("X_train loaded", X_train.shape)
+# X_test = read_csv_from_azure("X_test.csv")
+# print("X_test loaded", X_test.shape)
+# y_train = read_csv_from_azure("y_train.csv")
+# print("y_train loaded", y_train.shape)
+# y_test = read_csv_from_azure("y_test.csv")
+# print("y_test loaded", y_test.shape)
 
 test_df = read_csv_from_azure("test_df.csv")
 print("test_df loaded", test_df.shape)
