@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from io import StringIO
 import pandas as pd
 import requests
+from io import StringIO, BytesIO
+import pickle
 
 app = Flask(__name__)
 
@@ -38,26 +40,12 @@ print("y_test loaded", y_test.shape)
 test_df = read_csv_from_azure("test_df.csv")
 print("test_df loaded", test_df.shape)
 
-#RandomForestClassifier
-print("Model training...")
-from sklearn.ensemble import RandomForestClassifier
-from imblearn.over_sampling import SMOTE
-from imblearn.pipeline import Pipeline
-
-randomforest_params = {
-    'n_estimators': 882, 
-    'max_depth': 20, 
-    'min_samples_split': 6, 
-    'min_samples_leaf': 10, 
-    'bootstrap': True
-    }
-
-smote = SMOTE(random_state=1001, k_neighbors=17)
-forest = RandomForestClassifier(**randomforest_params)
-forest_smote = Pipeline([('smote', smote), ('model', forest)])
-
-model_fited = forest_smote.fit(X_train, y_train)
-
+print("loading model...")
+# Chargement d'un model depuis un fichier pickle depuis Azure
+sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/model.pkl"
+r = requests.get(sap_blob_url)
+model = pickle.load(BytesIO(r.content))
+print("Model loaded")
 
 print("Model trained")
 @app.route('/predict/', methods=['GET'])
@@ -80,7 +68,7 @@ def respond():
     else:
 
         # Get the predic_proba of the client_id
-        proba = model_fited.predict_proba(test_df[test_df.index == client_id].values[0])[0][1]
+        proba = model.predict_proba(test_df[test_df.index == client_id].values[0])[0][1]
         response["proba"] = proba
         # Check if the user wants to see the local feature importance
         if feature_importance:
