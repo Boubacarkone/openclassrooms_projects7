@@ -1,26 +1,94 @@
 from flask import Flask, request, jsonify
+from io import StringIO
+import pandas as pd
+import requests
+
 app = Flask(__name__)
 
 
-@app.route('/getmsg/', methods=['GET'])
+def read_csv_from_azure(relatif_path:str):
+
+    # URL SAP de l'objet blob
+    if 'data' in relatif_path:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/" + relatif_path
+    else:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/" + relatif_path
+
+    # Récupération du fichier csv
+    r = requests.get(sap_blob_url)
+
+    # Création du dataframe
+    df = pd.read_csv(StringIO(r.text), index_col=[0])
+    return df
+
+
+# load data to train the model and deploy it with flask
+# data:
+# for debug:
+print("Loading data...")
+X_train = read_csv_from_azure("X_train.csv")
+print("X_train loaded", X_train.shape)
+X_test = read_csv_from_azure("X_test.csv")
+print("X_test loaded", X_test.shape)
+y_train = read_csv_from_azure("y_train.csv")
+print("y_train loaded", y_train.shape)
+y_test = read_csv_from_azure("y_test.csv")
+print("y_test loaded", y_test.shape)
+
+test_df = read_csv_from_azure("test_df.csv")
+print("test_df loaded", test_df.shape)
+
+#RandomForestClassifier
+print("Model training...")
+from sklearn.ensemble import RandomForestClassifier
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline
+
+randomforest_params = {
+    'n_estimators': 882, 
+    'max_depth': 20, 
+    'min_samples_split': 6, 
+    'min_samples_leaf': 10, 
+    'bootstrap': True
+    }
+
+smote = SMOTE(random_state=1001, k_neighbors=17)
+forest = RandomForestClassifier(**randomforest_params)
+forest_smote = Pipeline([('smote', smote), ('model', forest)])
+
+model_fited = forest_smote.fit(X_train, y_train)
+
+
+print("Model trained")
+@app.route('/predict/', methods=['GET'])
 def respond():
     # Retrieve the name and first_name from the url parameter /getmsg/?name=
-    name = request.args.get("name", None)
-    first_name = request.args.get("first_name", None)
+    client_id = request.args.get("client_id", None)
+    feature_importance = request.args.get("return_local_feature_imp", None)
 
     # For debugging
-    print(f"Received: {name}")
+    #print(f"Received: {name}")
 
     response = {}
 
     # Check if the user sent a name at all
-    if not name:
-        response["ERROR"] = "No name found. Please send a name."
-    # Check if the user entered a number
-    elif str(name).isdigit():
-        response["ERROR"] = "The name can't be numeric. Please send a string."
+    if not client_id:
+        response["ERROR"] = "No client ID found. Please send a Client ID."
+    # Check if the user entered a string
+    elif isinstance(client_id, str):
+        response["ERROR"] = "The client ID can't be string. Please send a number."
     else:
-        response["MESSAGE"] = f"Welcome {name}, {first_name} to our awesome API!"
+
+        # Get the predic_proba of the client_id
+        proba = model_fited.predict_proba(test_df[test_df.index == client_id].values[0])[0][1]
+        response["proba"] = proba
+        # Check if the user wants to see the local feature importance
+        if feature_importance:
+            response["local_feature_importance"] = "The feature importance not supported yet" #local_explainer(client_id, explainer).to_dict()
+            
+        else:
+            pass
+            #response["MESSAGE"] = f"Welcome {name}, {first_name} to our awesome API!"
 
     # Return the response in json format
     return jsonify(response)
