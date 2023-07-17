@@ -23,8 +23,9 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/id_rsa bkone@flask-api.francecentral.cloudapp.azure.com << 'EOF'
-            cd project_7
-            source venv/bin/activate
-            export FLASK_APP=src/app.py
-            flask run -h 0.0.0.0
+            # Kill existing tmux session if it exists
+            tmux kill-session -t flask_api_session 2>/dev/null || true
+
+            # Create new tmux session and run commands
+            tmux new-session -d -s flask_api_session 'cd project_7; source venv/bin/activate; export FLASK_APP=src/app.py; flask run -h 0.0.0.0'
           EOF
