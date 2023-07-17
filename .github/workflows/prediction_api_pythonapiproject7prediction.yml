@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/id_rsa username@flask-api.francecentral.cloudapp.azure.com << 'EOF'
+          ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/id_rsa bkone@flask-api.francecentral.cloudapp.azure.com << 'EOF'
             cd project_7
             source venv/bin/activate
             export FLASK_APP=src/app.py
