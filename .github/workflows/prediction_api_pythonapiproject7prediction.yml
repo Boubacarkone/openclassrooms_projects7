@@ -1,0 +1,27 @@
+name: Run API on Azure
+
+on:
+  push:
+    branches:
+      - prediction_api
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Run API on Azure
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/id_rsa username@flask-api.francecentral.cloudapp.azure.com << 'EOF'
+            cd project_7
+            source venv/bin/activate
+            export FLASK_APP=src/app.py
+            flask run -h 0.0.0.0
+          EOF
