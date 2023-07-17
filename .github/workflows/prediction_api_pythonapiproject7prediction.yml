@@ -3,7 +3,7 @@ name: Run API on Azure
 on:
   push:
     branches:
-      - prediction_api
+      - main
 
 jobs:
   deploy:
@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Create SSH directory
+        run: mkdir -p ~/.ssh
 
       - name: Run API on Azure
         env:
