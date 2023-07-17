@@ -3,7 +3,7 @@ name: Run API on Azure
 on:
   push:
     branches:
-      - main
+      - prediction_api
 
 jobs:
   deploy:
