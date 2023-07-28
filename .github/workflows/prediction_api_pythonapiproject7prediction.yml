@@ -16,7 +16,7 @@ jobs:
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
 
-      - name: Run tests and git pull
+      - name: Run git pull and tests on Azure VM
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -47,7 +47,7 @@ jobs:
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
 
-      - name: Run API on Azure
+      - name: Run API on Azure VM
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
@@ -58,5 +58,5 @@ jobs:
             tmux kill-session -t flask_api_session 2>/dev/null || true
 
             # Create new tmux session and run commands
-            tmux new-session -d -s flask_api_session 'cd openclassrooms_projects7; chmod +x run_api.sh; ./run_api.sh > /dev/null 2>&1 &'
+            tmux new-session -d -s flask_api_session 'cd openclassrooms_projects7; chmod +x run_api.sh; ./run_api.sh > log.txt 2>&1'
           EOF

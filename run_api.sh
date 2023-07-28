@@ -14,7 +14,7 @@ fi
 
 # exécuter l'API
 export FLASK_APP=app.py
-export FLASK_ENV=production
+#export FLASK_ENV=production
 flask run -h 0.0.0.0
 
 echo "API is running"
