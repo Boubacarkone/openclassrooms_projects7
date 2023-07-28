@@ -26,6 +26,16 @@ jobs:
             cd openclassrooms_projects7
             git checkout prediction_api
             git pull
+            # Vériier si le dossier venv existe et installer les dépendances
+            if [ ! -d "venv" ]; then
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+            else
+                source venv/bin/activate
+                pip install -r requirements.txt
+            fi
+            # Lancer les tests
             pytest -v test.py
           EOF
 
