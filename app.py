@@ -14,6 +14,8 @@ from flask import Flask
 #from flask_cors import CORS
 from flask_restful import Api, Resource, reqparse
 from pathlib import Path
+import requests
+from io import StringIO, BytesIO
 
 import lime
 import lime.lime_tabular
@@ -27,25 +29,46 @@ APP = Flask(__name__)
 API = Api(APP)
 
 
-model = pickle.load(open(PROJECT_ROOT + '/model_and_data/model.pkl', 'rb'))
+#model = pickle.load(open(PROJECT_ROOT + '/model_and_data/model.pkl', 'rb'))
 
-test_df = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df.csv', index_col=[0])
+# Chargement d'un model depuis un fichier pickle depuis Azure
+sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/model.pkl"
+r = requests.get(sap_blob_url)
+model = pickle.load(BytesIO(r.content))
 
+def read_csv_from_azure(relatif_path:str):
 
-X_train = pd.read_csv(PROJECT_ROOT + '/model_and_data/X_train.csv', index_col=[0])
-X_test = pd.read_csv(PROJECT_ROOT + '/model_and_data/X_test.csv', index_col=[0])
-y_train = pd.read_csv(PROJECT_ROOT + '/model_and_data/y_train.csv', index_col=[0])
-y_test = pd.read_csv(PROJECT_ROOT + '/model_and_data/y_test.csv', index_col=[0])
+    # URL SAP de l'objet blob
+    if 'data' in relatif_path:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/" + relatif_path
+    else:
+        sap_blob_url = "https://dashboardd.blob.core.windows.net/dashboarddata/model_and_data/" + relatif_path
+
+    # Récupération du fichier csv
+    r = requests.get(sap_blob_url)
+
+    # Création du dataframe
+    df = pd.read_csv(StringIO(r.text), index_col=[0])
+    return df
+
+#test_df = pd.read_csv(PROJECT_ROOT + '/model_and_data/test_df.csv', index_col=[0])
+test_df = read_csv_from_azure('model_and_data/test_df.csv')
+
+#X_train = pd.read_csv(PROJECT_ROOT + '/model_and_data/X_train.csv', index_col=[0])
+X_train = read_csv_from_azure('model_and_data/X_train.csv')
+#X_test = pd.read_csv(PROJECT_ROOT + '/model_and_data/X_test.csv', index_col=[0])
+#y_train = pd.read_csv(PROJECT_ROOT + '/model_and_data/y_train.csv', index_col=[0])
+#y_test = pd.read_csv(PROJECT_ROOT + '/model_and_data/y_test.csv', index_col=[0])
 print("Data loaded:")
 print(X_train.shape)
-print(X_test.shape)
-print(y_train.shape)
-print(y_test.shape)
+#print(X_test.shape)
+#print(y_train.shape)
+#print(y_test.shape)
 
 # Get the index of the categorical variables
 var_cats = []
 for var in test_df.columns:
-
+        
     if len(test_df[var].value_counts().values.tolist()) == 2:
         var_cats.append(var)
 
@@ -61,19 +84,21 @@ explainer = lime.lime_tabular.LimeTabularExplainer(
 )
 
 def local_explainer(customer_id, explainer):
-
+    
     exp = explainer.explain_instance(
-        test_df[test_df.index == customer_id].values[0],
+        test_df[test_df.index == customer_id].values[0], 
         predict_fn = model.predict_proba,
         num_features=len(X_train.columns)
     )
-
+    
     exp_df = pd.DataFrame(exp.as_list(), columns=['Feature', 'Importance'])
     exp_df['abs_values'] = np.abs(exp_df.Importance)
     exp_df.sort_values(by='abs_values', ascending=True, inplace=True)
     #exp_df.set_index('Feature', inplace=True)
     #exp_df.drop('abs_values', axis=1, inplace=True)
     return exp_df
+
+
 
 
 # Controller-1
@@ -92,7 +117,7 @@ def get_demo_name():
         regex = re.compile(r'\d+')
         name = regex.findall(str(data))[0]
         SK_ID_CURR = int(name)
-
+        
         try:
             row = test_df[test_df.index == int(SK_ID_CURR)]
         except Exception as e:
@@ -107,7 +132,7 @@ def get_demo_name():
                 time_elapsed = time.time() - start_time
             except Exception as e:
                 return f'Error to get the local feature importance! : {e}'
-
+            
         else:
             print("local_feature_importance_show = False")
             exp_df = pd.DataFrame()
@@ -128,6 +153,4 @@ def get_demo_name():
 
 #Get the categorical variables data to be used in the front end
 if __name__ == "__main__":
-    APP.run(debug=True, port=8000)
-
-#gunicorn -w 4 --bind 0.0.0.0:8000 src/app:app
+    APP.run()

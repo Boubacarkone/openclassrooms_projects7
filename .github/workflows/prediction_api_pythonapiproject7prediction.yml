@@ -6,13 +6,34 @@ on:
       - prediction_api
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Create SSH directory
+        run: mkdir -p ~/.ssh
+
+      - name: Run tests and git pull
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh -o "StrictHostKeyChecking=no" -i ~/.ssh/id_rsa bkone@flask-api.francecentral.cloudapp.azure.com << 'EOF'
+            cd openclassrooms_projects7
+            git checkout prediction_api
+            git pull
+            pytest -v test.py
+          EOF
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Create SSH directory
         run: mkdir -p ~/.ssh
 
@@ -27,5 +48,5 @@ jobs:
             tmux kill-session -t flask_api_session 2>/dev/null || true
 
             # Create new tmux session and run commands
-            tmux new-session -d -s flask_api_session 'cd project_7; source venv/bin/activate; export FLASK_APP=src/app.py; flask run -h 0.0.0.0'
+            tmux new-session -d -s flask_api_session 'cd openclassrooms_projects7; chmod +x run_api.sh; ./run_api.sh > /dev/null 2>&1 &'
           EOF
