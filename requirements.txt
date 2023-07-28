@@ -13,7 +13,7 @@ matplotlib==3.5.0
 flask-cors==3.0.10
 jinja2==3.0.3
 pytest==7.3.1
-scikit-learn
+scikit-learn==1.1.1
 lightgbm
 lime
 imbalanced-learn
@@ -22,7 +22,6 @@ scikit-image
 flask_restful
 hvplot
 nbconvert
-gunicorn
 greetings
 click==8.0.3
 Flask==2.0.2
