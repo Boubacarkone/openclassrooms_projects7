@@ -19,6 +19,11 @@ data/
 lib64/
 parts/
 sdist/
+data/
+data_and_model/
+data_dev/
+data_and_model_dev/
+mlruns/
 var/
 wheels/
 pip-wheel-metadata/
