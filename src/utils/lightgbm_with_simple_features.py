@@ -329,7 +329,6 @@ def display_importances(feature_importance_df_, n_feat=40, fx=8, fy=10):
     plt.tight_layout()
     plt.savefig('lgbm_importances01.png')
 
-
 def main(debug = False):
     num_rows = 20000 if debug else None
     df = application_train_test(num_rows)
