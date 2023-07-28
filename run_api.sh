@@ -11,6 +11,6 @@ export FLASK_APP=app.py
 #flask run -h 0.0.0.0
 
 # exécuter l'API avec gunicorn
-gunicorn -w 4 --bind 0.0.0.0:8000 app:APP
+gunicorn -w 4 --bind 0.0.0.0:5000 app:APP
 
 echo "API is running"
