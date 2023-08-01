@@ -16,7 +16,6 @@ eggs/
 .eggs/
 lib/
 data/
-mlruns/
 lib64/
 parts/
 sdist/
