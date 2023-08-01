@@ -15,6 +15,11 @@ downloads/
 eggs/
 .eggs/
 lib/
+mlruns/
+model_and_data/
+model_and_data_dev/
+Notebooks/mlruns/
+data_dev/
 data/
 lib64/
 parts/
