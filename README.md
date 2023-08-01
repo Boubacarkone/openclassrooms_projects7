@@ -13,3 +13,5 @@ Prêt à dépenser décide donc de développer un dashboard interactif pour que 
 
 Les données téléchargées sur le lien donnée dans le consignes est : data/Projet+Mise+en+prod+-+home-credit-default-risk.zip
 Son contenu dézipé contenant plusieurs fichier csv dans le folder data/tables.
+
+## Organisation du git
