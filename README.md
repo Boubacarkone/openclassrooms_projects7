@@ -15,3 +15,11 @@ Les données téléchargées sur le lien donnée dans le consignes est : data/Pr
 Son contenu dézipé contenant plusieurs fichier csv dans le folder data/tables.
 
 ## Organisation du git
+Organisation en branche : une branche par fonctionnalité ;
+- la branche data_preprocessing : pour la préparation des données (application du kenel kaggle, sélection de features ...)
+- la branche modelisation : pour la construction des modèles (modèles sélection, optimisation...)
+- la branche prediction_api :  pour le déploiement du modèle final via CI/CD de git action à chaque push sur cette branche.
+- la branche Dashboard : pour l'implémentation et le déploiement du dashbord via une autre CI/CD de git action à chaque push sur cette branche aussi.
+
+## Librairie utilisées dans le projet 
+- La liste des librairie pour l'environement du projet se trouve dans les branche modélisation, prediction_api et Dashboard, dans le fichier nomé requirement.txt.
