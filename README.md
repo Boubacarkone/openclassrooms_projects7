@@ -6,4 +6,5 @@ Développer un dashboard interactif
 - Entrainement des modèles
 - Modèles sélection
 - Feature importance
+- Analyse du data drift
 
